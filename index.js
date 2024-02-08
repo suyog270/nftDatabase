@@ -1,13 +1,16 @@
 const express = require("express")
 const cors = require('cors')
 const multer = require("multer")
-const port = 3001
 const fs = require("fs")
+const port = 3001
+
 const server = new express()
 const path = require("path")
-require("dotenv").config()
+
+
 
 server.use('/images', express.static(path.join(__dirname, 'images')));
+server.use('/uri', express.static(path.join(__dirname, 'uri')));
 
 const mongoose = require("mongoose")
 
@@ -27,14 +30,37 @@ const bodyParser = require("body-parser")
 server.use(bodyParser.json());
 server.use(cors());
 
+/*
+
+{
+    name,
+    tokenId,
+    file
+}
+
+*/
 
 server.post("/db", upload.single('image'), (req, res) => {
     const tokenId = req.body.tokenId
     const name = req.body.name
+    const imageURL = `http://localhost:${port}/images/${req.file.filename}`;
+    const data = {
+        "name": name,
+        "Image": imageURL
+    }
+    console.log( data )
+    const dataString = JSON.stringify(data, null, 2)
 
 
-    console.log(req.file.filename)
-
+    fs.writeFile(`./uri/${tokenId}.json`, dataString, (e) => {
+        if(e){
+            console.log(e)
+            return
+        }
+    });
+    const uri = `http://localhost:${port}/uri/${tokenId}.json`
+    console.log(uri)
+    res.send({"uri": uri})
 })
 
 
