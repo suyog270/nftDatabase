@@ -9,8 +9,8 @@ const path = require("path")
 
 
 
-server.use('/images', express.static(path.join(__dirname, 'images')));
-server.use('/uri', express.static(path.join(__dirname, 'uri')));
+server.use('/images', cors(), express.static(path.join(__dirname, 'images')));
+server.use('/uri',cors(), express.static(path.join(__dirname, 'uri')));
 
 const mongoose = require("mongoose")
 
@@ -30,20 +30,11 @@ const bodyParser = require("body-parser")
 server.use(bodyParser.json());
 server.use(cors());
 
-/*
-
-{
-    name,
-    tokenId,
-    file
-}
-
-*/
-
 server.post("/db", upload.single('image'), (req, res) => {
     const tokenId = req.body.tokenId
     const name = req.body.name
     const imageURL = `http://localhost:${port}/images/${req.file.filename}`;
+    console.log( name )
     const data = {
         "name": name,
         "Image": imageURL
